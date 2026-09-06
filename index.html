@@ -1,0 +1,1408 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>전주시 덕진구 아파트 거래 브리핑 대시보드</title>
+    <meta
+      name="description"
+      content="주연공인중개사사무소를 위한 전주시 덕진구 아파트 매매, 전세, 월세 거래량 TOP10 및 입지분석 대시보드"
+    />
+    <style>
+:root {
+  color: #291705;
+  background: #fff8ed;
+  font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  --ink: #2b1907;
+  --muted: #7d6042;
+  --line: rgba(121, 73, 20, 0.16);
+  --panel: rgba(255, 252, 246, 0.92);
+  --orange: #f68b1f;
+  --amber: #ffc247;
+  --gold: #d99a27;
+  --copper: #9b4d16;
+  --green: #347d55;
+  --blue: #406b9e;
+  --shadow: 0 18px 55px rgba(112, 62, 9, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 213, 103, 0.38), transparent 28%),
+    linear-gradient(135deg, #fff3dc 0%, #fff9f0 42%, #ffe0aa 100%);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.app-shell {
+  width: min(1440px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 28px;
+}
+
+.hero-panel {
+  min-height: 270px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 34px;
+  color: #fffdf8;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  background:
+    radial-gradient(circle at 78% 16%, rgba(255, 213, 103, 0.42), transparent 28%),
+    linear-gradient(115deg, rgba(51, 24, 4, 0.97), rgba(150, 71, 7, 0.86) 55%, rgba(255, 158, 38, 0.78));
+  overflow: hidden;
+}
+
+.hero-copy {
+  max-width: 780px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: #b96812;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.hero-panel .eyebrow {
+  color: #ffd56f;
+}
+
+h1,
+h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: clamp(34px, 5vw, 62px);
+  line-height: 1.04;
+  max-width: 820px;
+}
+
+h2 {
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.hero-copy p:last-child {
+  max-width: 680px;
+  margin: 16px 0 0;
+  color: rgba(255, 252, 243, 0.86);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.hero-actions,
+.control-strip,
+.api-grid,
+.panel-heading,
+.legend,
+.office-footer {
+  display: flex;
+  align-items: center;
+}
+
+.hero-actions {
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.primary-action,
+.call-action,
+#loadApiButton {
+  min-height: 46px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 18px;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.primary-action {
+  background: #fff6e7;
+  color: var(--copper);
+}
+
+.call-action,
+#loadApiButton {
+  background: linear-gradient(135deg, var(--orange), var(--amber));
+  color: #2b1603;
+}
+
+.control-strip {
+  margin-top: 16px;
+  padding: 14px;
+  gap: 12px;
+  flex-wrap: wrap;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 251, 243, 0.86);
+  box-shadow: 0 10px 26px rgba(120, 70, 10, 0.08);
+}
+
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  min-width: 250px;
+  padding: 4px;
+  border-radius: 8px;
+  background: #f2dfc3;
+}
+
+.segment {
+  border: 0;
+  border-radius: 6px;
+  min-height: 38px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.segment.active {
+  background: #fffdfa;
+  color: var(--copper);
+  box-shadow: 0 7px 18px rgba(142, 76, 9, 0.15);
+}
+
+.date-control,
+.select-control,
+.api-grid label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.date-control input,
+.select-control select,
+.api-grid input {
+  min-height: 42px;
+  min-width: 180px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  color: var(--ink);
+  background: #fffdfa;
+}
+
+.select-control select {
+  min-width: 260px;
+}
+
+.api-panel {
+  margin-left: auto;
+  min-width: min(100%, 460px);
+}
+
+.api-panel summary {
+  cursor: pointer;
+  color: var(--copper);
+  font-weight: 900;
+}
+
+.api-grid {
+  margin-top: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.api-grid label:first-child {
+  flex: 1 1 220px;
+}
+
+.api-grid input {
+  width: 100%;
+}
+
+.api-status {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.kpi-grid,
+.dashboard-grid,
+.top-lists,
+.location-cards {
+  display: grid;
+  gap: 16px;
+}
+
+.kpi-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.kpi-card,
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 10px 28px rgba(112, 62, 9, 0.08);
+}
+
+.kpi-card {
+  padding: 20px;
+}
+
+.kpi-card span,
+.kpi-card small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.kpi-card strong {
+  display: block;
+  margin: 8px 0;
+  font-size: 36px;
+}
+
+.dashboard-grid {
+  grid-template-columns: minmax(0, 1.7fr) minmax(330px, 0.7fr);
+  margin-top: 16px;
+}
+
+.panel {
+  padding: 22px;
+}
+
+.panel-heading {
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.legend {
+  gap: 12px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  flex-wrap: wrap;
+}
+
+.legend i {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  border-radius: 2px;
+  margin-right: 5px;
+}
+
+.sale {
+  background: var(--orange);
+}
+
+.jeonse {
+  background: var(--blue);
+}
+
+.monthly {
+  background: var(--green);
+}
+
+.bar-chart {
+  display: grid;
+  gap: 13px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 210px) 1fr 44px;
+  gap: 12px;
+  align-items: center;
+}
+
+.bar-label {
+  min-width: 0;
+  font-weight: 900;
+}
+
+.bar-label small {
+  display: block;
+  color: var(--muted);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.bar-track {
+  height: 36px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f3dfbf;
+  display: flex;
+}
+
+.bar-segment {
+  min-width: 3px;
+}
+
+.bar-value {
+  text-align: right;
+  font-weight: 900;
+}
+
+.briefing-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.briefing-list li {
+  padding: 14px;
+  border-radius: 8px;
+  background: #fff4dd;
+  color: #4b2c0d;
+  line-height: 1.55;
+}
+
+.top-lists {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.rank-list {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  counter-reset: rank;
+}
+
+.rank-list li {
+  counter-increment: rank;
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 11px;
+  border: 1px solid rgba(155, 77, 22, 0.1);
+  border-radius: 8px;
+  background: #fffaf1;
+}
+
+.rank-list li::before {
+  content: counter(rank);
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  color: #fffdf8;
+  background: linear-gradient(135deg, var(--copper), var(--orange));
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.rank-name {
+  font-weight: 900;
+  min-width: 0;
+}
+
+.rank-meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.rank-count {
+  font-weight: 900;
+  color: var(--copper);
+}
+
+.location-panel {
+  margin-top: 16px;
+}
+
+.map-section {
+  margin-top: 16px;
+}
+
+.map-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.55fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.map-canvas {
+  position: relative;
+  min-height: 430px;
+  border: 1px solid rgba(155, 77, 22, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 68% 22%, rgba(255, 193, 71, 0.28), transparent 20%),
+    radial-gradient(circle at 30% 58%, rgba(60, 122, 94, 0.12), transparent 24%),
+    linear-gradient(28deg, transparent 0 45%, rgba(246, 139, 31, 0.12) 45% 48%, transparent 48%),
+    linear-gradient(146deg, transparent 0 40%, rgba(64, 107, 158, 0.12) 40% 42%, transparent 42%),
+    linear-gradient(115deg, rgba(255, 248, 228, 0.95), rgba(255, 232, 179, 0.72));
+}
+
+.map-canvas::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.54) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.44) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+}
+
+.map-river {
+  position: absolute;
+  left: -4%;
+  top: 48%;
+  width: 108%;
+  height: 58px;
+  transform: rotate(-8deg);
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(99, 151, 190, 0.22), rgba(99, 151, 190, 0.42), rgba(99, 151, 190, 0.18));
+}
+
+.map-road {
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(115, 78, 40, 0.2);
+  box-shadow: 0 0 0 5px rgba(255, 255, 255, 0.42);
+}
+
+.road-one {
+  left: 18%;
+  top: -8%;
+  width: 24px;
+  height: 122%;
+  transform: rotate(18deg);
+}
+
+.road-two {
+  left: -8%;
+  top: 38%;
+  width: 116%;
+  height: 20px;
+  transform: rotate(-4deg);
+}
+
+.map-district {
+  position: absolute;
+  z-index: 1;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: rgba(43, 25, 7, 0.72);
+  color: #fff9ed;
+  font-size: 12px;
+  font-weight: 900;
+  backdrop-filter: blur(8px);
+}
+
+.map-road-label {
+  position: absolute;
+  z-index: 1;
+  padding: 4px 7px;
+  border-radius: 6px;
+  background: rgba(255, 253, 250, 0.78);
+  color: #704012;
+  border: 1px solid rgba(155, 77, 22, 0.14);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.label-sebyeong {
+  left: 64%;
+  top: 40%;
+  transform: rotate(-4deg);
+}
+
+.label-baekseok {
+  left: 58%;
+  top: 18%;
+  transform: rotate(18deg);
+}
+
+.label-dongbu {
+  left: 70%;
+  top: 53%;
+  transform: rotate(18deg);
+}
+
+.label-girim {
+  left: 24%;
+  top: 43%;
+  transform: rotate(-7deg);
+}
+
+.district-eco {
+  left: 59%;
+  top: 13%;
+}
+
+.district-campus {
+  left: 21%;
+  top: 56%;
+}
+
+.district-core {
+  left: 39%;
+  top: 45%;
+}
+
+.district-east {
+  left: 68%;
+  top: 64%;
+}
+
+.map-marker {
+  position: absolute;
+  z-index: 2;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  color: #fffdf8;
+  background: linear-gradient(135deg, var(--copper), var(--orange));
+  box-shadow: 0 8px 22px rgba(82, 42, 4, 0.28), 0 0 0 7px rgba(255, 184, 75, 0.22);
+  font-weight: 900;
+}
+
+.map-marker.selected {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #2b1907, #f68b1f);
+  box-shadow: 0 13px 30px rgba(82, 42, 4, 0.34), 0 0 0 10px rgba(255, 210, 111, 0.36);
+}
+
+.map-marker span {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 8px);
+  width: 178px;
+  transform: translateX(-50%);
+  border-radius: 8px;
+  padding: 6px 8px;
+  background: rgba(255, 253, 250, 0.94);
+  color: var(--ink);
+  border: 1px solid rgba(155, 77, 22, 0.14);
+  font-size: 11px;
+  line-height: 1.25;
+  box-shadow: 0 8px 18px rgba(82, 42, 4, 0.12);
+}
+
+.map-marker small {
+  display: block;
+  margin-top: 3px;
+  color: #7d6042;
+  font-weight: 700;
+}
+
+.map-brief {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  border-radius: 8px;
+  padding: 20px;
+  background: linear-gradient(145deg, #2b1907, #7e390b);
+  color: #fff9ed;
+}
+
+.map-brief h3 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.map-brief address {
+  margin: -6px 0 0;
+  color: #ffd98b;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.map-brief p {
+  margin: 0;
+  color: rgba(255, 249, 237, 0.82);
+  line-height: 1.65;
+}
+
+.map-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.map-metrics span {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  border-radius: 8px;
+  padding: 12px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffd98b;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.map-metrics strong {
+  color: #fffdf8;
+  font-size: 24px;
+}
+
+.analysis-note {
+  margin: 0;
+  max-width: 520px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.location-cards {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.location-card {
+  border: 1px solid rgba(155, 77, 22, 0.12);
+  border-radius: 8px;
+  padding: 16px;
+  background: #fffaf1;
+}
+
+.location-card.selected {
+  border-color: rgba(246, 139, 31, 0.72);
+  background: linear-gradient(135deg, #fff8e9, #fff0cb);
+}
+
+.location-title {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.location-title h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.badge {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: #4b2c0d;
+  color: #fff8ed;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.score {
+  padding: 9px 6px;
+  border-radius: 8px;
+  background: #fffdfa;
+  text-align: center;
+  border: 1px solid rgba(155, 77, 22, 0.1);
+}
+
+.score span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.score strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--copper);
+  font-size: 18px;
+}
+
+.location-card p {
+  margin: 0;
+  color: #4b2c0d;
+  line-height: 1.62;
+}
+
+.office-footer {
+  margin-top: 16px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px;
+  border-radius: 8px;
+  background: #2b1907;
+  color: #fff9ed;
+}
+
+.office-footer div {
+  display: grid;
+  gap: 4px;
+}
+
+.office-footer span {
+  color: #ffd98b;
+}
+
+.office-footer a {
+  color: #fff9ed;
+  font-size: 22px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+@media (max-width: 980px) {
+  .hero-panel,
+  .dashboard-grid,
+  .top-lists,
+  .location-cards,
+  .map-layout,
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-panel {
+    display: grid;
+    align-items: end;
+  }
+
+  .hero-actions {
+    justify-content: start;
+  }
+
+  .kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    width: min(100% - 20px, 1440px);
+    padding-top: 10px;
+  }
+
+  .hero-panel,
+  .panel,
+  .kpi-card {
+    padding: 18px;
+  }
+
+  .kpi-grid,
+  .score-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .segmented,
+  .date-control,
+  .select-control,
+  .date-control input,
+  .select-control select,
+  .api-panel {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .bar-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .bar-value {
+    text-align: left;
+  }
+
+  .map-canvas {
+    min-height: 360px;
+  }
+
+  .map-marker span {
+    display: none;
+  }
+
+  .map-road-label {
+    font-size: 10px;
+  }
+}
+
+@media print {
+  body {
+    background: white;
+  }
+
+  .control-strip,
+  .hero-actions {
+    display: none;
+  }
+
+  .app-shell {
+    width: 100%;
+    padding: 0;
+  }
+
+  .hero-panel,
+  .panel,
+  .kpi-card,
+  .office-footer {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
+
+    </style>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero-panel">
+        <div class="hero-copy">
+          <p class="eyebrow">Jeonju Deokjin Apartment Briefing</p>
+          <h1>전주시 덕진구 아파트 거래량 TOP10 브리핑</h1>
+          <p>
+            매매, 전세, 월세 거래 흐름과 단지별 생활 입지를 한 화면에서 정리해
+            고객 상담 때 바로 설명할 수 있도록 구성했습니다.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="primary-action" id="printButton" type="button">인쇄</button>
+          <a class="call-action" href="tel:01063323112">전화 자동연결</a>
+        </div>
+      </section>
+
+      <section class="control-strip" aria-label="조회 조건">
+        <div class="segmented" role="tablist" aria-label="기간 단위">
+          <button class="segment" type="button" data-period="daily">일간</button>
+          <button class="segment" type="button" data-period="weekly">주간</button>
+          <button class="segment active" type="button" data-period="monthly">월간</button>
+        </div>
+        <label class="date-control">
+          <span>기준 날짜</span>
+          <input id="datePicker" type="date" />
+        </label>
+        <label class="select-control">
+          <span>성착 지정 아파트</span>
+          <select id="apartmentSelect"></select>
+        </label>
+        <details class="api-panel">
+          <summary>공공데이터 API 연결</summary>
+          <div class="api-grid">
+            <label>
+              <span>인증키</span>
+              <input id="apiKeyInput" type="password" autocomplete="off" placeholder="공공데이터포털 인증키" />
+            </label>
+            <label>
+              <span>지역코드</span>
+              <input id="lawdInput" type="text" value="52113" maxlength="5" />
+            </label>
+            <button id="loadApiButton" type="button">실거래 갱신</button>
+          </div>
+          <p id="apiStatus" class="api-status">기본값은 전북특별자치도 전주시 덕진구 코드 52113입니다.</p>
+        </details>
+      </section>
+
+      <section class="kpi-grid" aria-label="거래 요약">
+        <article class="kpi-card">
+          <span>총 거래</span>
+          <strong id="totalDeals">0건</strong>
+          <small id="periodLabel">월간 기준</small>
+        </article>
+        <article class="kpi-card">
+          <span>매매</span>
+          <strong id="saleDeals">0건</strong>
+          <small>실거래 신고 기준</small>
+        </article>
+        <article class="kpi-card">
+          <span>전세</span>
+          <strong id="jeonseDeals">0건</strong>
+          <small>보증금 중심 수요</small>
+        </article>
+        <article class="kpi-card">
+          <span>월세</span>
+          <strong id="monthlyDeals">0건</strong>
+          <small>월 임대료 발생 건</small>
+        </article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel chart-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Volume Top 10</p>
+              <h2>아파트별 거래건수 막대그래프</h2>
+            </div>
+            <div class="legend">
+              <span><i class="sale"></i>매매</span>
+              <span><i class="jeonse"></i>전세</span>
+              <span><i class="monthly"></i>월세</span>
+            </div>
+          </div>
+          <div id="barChart" class="bar-chart" aria-label="아파트 거래 건수 TOP10"></div>
+        </article>
+
+        <aside class="panel briefing-panel">
+          <p class="eyebrow">Briefing Script</p>
+          <h2>상담 브리핑 포인트</h2>
+          <ul id="briefingList" class="briefing-list"></ul>
+        </aside>
+      </section>
+
+      <section class="top-lists" aria-label="상단 TOP10 목록">
+        <article class="panel">
+          <p class="eyebrow">Dong Top 10</p>
+          <h2>동별 거래건수</h2>
+          <ol id="dongTop" class="rank-list"></ol>
+        </article>
+        <article class="panel">
+          <p class="eyebrow">Apartment Top 10</p>
+          <h2>아파트별 거래건수</h2>
+          <ol id="aptTop" class="rank-list"></ol>
+        </article>
+        <article class="panel">
+          <p class="eyebrow">Area Top 10</p>
+          <h2>평형별 거래건수</h2>
+          <ol id="areaTop" class="rank-list"></ol>
+        </article>
+      </section>
+
+      <section class="map-section" aria-label="덕진구 아파트 지도">
+        <article class="panel map-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Deokjin Map</p>
+              <h2>덕진구 TOP10 아파트 위치 지도</h2>
+            </div>
+            <p class="analysis-note">마커를 누르면 성착 지정 아파트와 입지분석이 함께 바뀝니다.</p>
+          </div>
+          <div class="map-layout">
+            <div class="map-canvas" role="img" aria-label="전주시 덕진구 주요 아파트 위치 지도">
+              <div class="map-river"></div>
+              <div class="map-road road-one"></div>
+              <div class="map-road road-two"></div>
+              <div class="map-district district-eco">에코시티</div>
+              <div class="map-district district-campus">전북대·덕진공원</div>
+              <div class="map-district district-core">금암·인후 생활권</div>
+              <div class="map-district district-east">우아·반월 생활권</div>
+              <div class="map-road-label label-sebyeong">세병로</div>
+              <div class="map-road-label label-baekseok">백석로</div>
+              <div class="map-road-label label-dongbu">동부대로</div>
+              <div class="map-road-label label-girim">기린대로</div>
+              <div id="mapMarkers"></div>
+            </div>
+            <div class="map-brief">
+              <h3 id="mapAptName">에코시티더샵</h3>
+              <address id="mapAptAddress">전북특별자치도 전주시 덕진구 송천동2가</address>
+              <p id="mapAptSummary">지도에서 단지를 선택하면 주변 생활권 브리핑이 표시됩니다.</p>
+              <div class="map-metrics">
+                <span><strong id="mapSchoolScore">94</strong>교육</span>
+                <span><strong id="mapLifeScore">88</strong>생활</span>
+                <span><strong id="mapTransitScore">90</strong>미래성</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel location-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Location Analysis</p>
+            <h2>TOP10 및 지정 아파트 입지분석</h2>
+          </div>
+          <p class="analysis-note">학원, 학교, 공원, 병원, 은행 접근성을 중심으로 상담 문장까지 정리했습니다.</p>
+        </div>
+        <div id="locationCards" class="location-cards"></div>
+      </section>
+
+      <footer class="office-footer">
+        <div>
+          <strong>주연공인중개사사무소</strong>
+          <span>대표 공인중개사 김주연</span>
+        </div>
+        <a href="tel:01063323112">010-6332-3112</a>
+      </footer>
+    </main>
+
+    <script>
+const LAW_D_DEFAULT = "52113";
+const tradeEndpoint = "https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev";
+const rentEndpoint = "https://apis.data.go.kr/1613000/RTMSDataSvcAptRent/getRTMSDataSvcAptRent";
+
+const seedDeals = [
+  ["에코시티더샵", "송천동2가", "84", "sale", 18],
+  ["에코시티더샵", "송천동2가", "84", "jeonse", 11],
+  ["에코시티더샵", "송천동2가", "59", "monthly", 5],
+  ["데시앙네스트", "송천동2가", "84", "sale", 16],
+  ["데시앙네스트", "송천동2가", "74", "jeonse", 8],
+  ["호반베르디움", "송천동2가", "84", "sale", 14],
+  ["호반베르디움", "송천동2가", "59", "monthly", 7],
+  ["포레나전주에코시티", "송천동2가", "84", "sale", 13],
+  ["포레나전주에코시티", "송천동2가", "101", "jeonse", 6],
+  ["전주혁신도시에코르", "장동", "84", "sale", 12],
+  ["전주혁신도시에코르", "장동", "59", "monthly", 4],
+  ["덕진엘에이치", "인후동1가", "59", "jeonse", 12],
+  ["덕진엘에이치", "인후동1가", "74", "sale", 9],
+  ["인후꿈마을부영", "인후동1가", "59", "monthly", 9],
+  ["인후꿈마을부영", "인후동1가", "84", "jeonse", 6],
+  ["금암중앙하이츠", "금암동", "84", "sale", 9],
+  ["금암중앙하이츠", "금암동", "59", "jeonse", 5],
+  ["우아한시티", "우아동3가", "84", "sale", 8],
+  ["우아한시티", "우아동3가", "59", "monthly", 6],
+  ["하가더루벤스", "덕진동2가", "84", "sale", 7],
+  ["하가더루벤스", "덕진동2가", "74", "jeonse", 7],
+  ["반월세움펠리피아", "반월동", "84", "sale", 7],
+  ["반월세움펠리피아", "반월동", "59", "monthly", 5],
+  ["팔복남양", "팔복동2가", "59", "jeonse", 6],
+  ["팔복남양", "팔복동2가", "84", "sale", 5],
+].flatMap(([apartment, dong, area, type, count]) =>
+  Array.from({ length: count }, (_, index) => ({
+    apartment,
+    dong,
+    area,
+    type,
+    date: new Date(2026, 7, Math.max(1, 29 - (index % 25))),
+  })),
+);
+
+const locationProfiles = {
+  "에코시티더샵": [94, 92, 90, 84, 82, "신축 선호와 학군 접근성이 동시에 강해 가족 단위 상담에서 미래가치 설명이 쉽습니다."],
+  "데시앙네스트": [91, 89, 88, 82, 80, "에코시티 생활권 안에서 학교와 공원 동선이 부드러워 실거주 만족도를 강조하기 좋습니다."],
+  "호반베르디움": [89, 87, 91, 83, 79, "공원 이용성과 단지 선호도가 높아 어린 자녀 가구에게 안정적인 선택지로 제시할 수 있습니다."],
+  "포레나전주에코시티": [88, 86, 92, 81, 78, "상권과 녹지 균형이 좋아 쾌적성과 편의성을 함께 설명하기 좋은 단지입니다."],
+  "전주혁신도시에코르": [82, 86, 85, 88, 84, "혁신도시 업무 수요와 의료, 금융 편의가 맞물려 직주근접 관점의 설득력이 있습니다."],
+  "덕진엘에이치": [78, 84, 80, 86, 83, "인후동 생활 인프라가 촘촘해 병원, 은행, 생활 상권 접근성을 실용적으로 브리핑할 수 있습니다."],
+  "인후꿈마을부영": [80, 82, 79, 85, 82, "월세와 전세 수요가 함께 움직이는 편이라 안정적인 임대 상담 소재가 됩니다."],
+  "금암중앙하이츠": [84, 81, 77, 90, 88, "도심 접근성과 금융, 병원 연결성이 강해 직장인과 시니어 상담에 유리합니다."],
+  "우아한시티": [76, 79, 78, 82, 79, "동부대로 생활축을 활용해 이동 편의성과 합리적 가격대를 함께 제안하기 좋습니다."],
+  "하가더루벤스": [83, 85, 87, 80, 77, "덕진공원, 전북대 생활권과 가까워 교육과 여가를 함께 원하는 고객에게 적합합니다."],
+  "반월세움펠리피아": [74, 76, 75, 78, 76, "산업단지와 생활권을 함께 보는 수요에게 출퇴근과 실속형 거주 포인트를 설명할 수 있습니다."],
+  "팔복남양": [70, 73, 74, 76, 74, "실속형 매수와 임대 수요를 중심으로 가격 접근성과 생활 편의를 강조하기 좋습니다."],
+};
+
+const mapPositions = {
+  "에코시티더샵": [66, 22],
+  "데시앙네스트": [72, 25],
+  "호반베르디움": [63, 30],
+  "포레나전주에코시티": [76, 32],
+  "전주혁신도시에코르": [57, 71],
+  "덕진엘에이치": [47, 49],
+  "인후꿈마을부영": [54, 45],
+  "금암중앙하이츠": [34, 53],
+  "우아한시티": [73, 61],
+  "하가더루벤스": [25, 63],
+  "반월세움펠리피아": [81, 73],
+  "팔복남양": [21, 36],
+};
+
+const apartmentAddress = {
+  "에코시티더샵": "전북특별자치도 전주시 덕진구 송천동2가 1338 일대",
+  "데시앙네스트": "전북특별자치도 전주시 덕진구 세병로 90 일대",
+  "호반베르디움": "전북특별자치도 전주시 덕진구 송천동2가 에코시티 생활권",
+  "포레나전주에코시티": "전북특별자치도 전주시 덕진구 세병로 21",
+  "전주혁신도시에코르": "전북특별자치도 전주시 덕진구 장동 혁신도시 생활권",
+  "덕진엘에이치": "전북특별자치도 전주시 덕진구 인후동1가 생활권",
+  "인후꿈마을부영": "전북특별자치도 전주시 덕진구 인후동1가 생활권",
+  "금암중앙하이츠": "전북특별자치도 전주시 덕진구 금암동 생활권",
+  "우아한시티": "전북특별자치도 전주시 덕진구 우아동3가 생활권",
+  "하가더루벤스": "전북특별자치도 전주시 덕진구 덕진동2가 생활권",
+  "반월세움펠리피아": "전북특별자치도 전주시 덕진구 반월동 생활권",
+  "팔복남양": "전북특별자치도 전주시 덕진구 팔복동2가 생활권",
+};
+
+let state = {
+  period: "monthly",
+  selectedDate: new Date(2026, 7, 30),
+  deals: seedDeals,
+  selectedApartment: "에코시티더샵",
+};
+
+const $ = (selector) => document.querySelector(selector);
+const $ = (selector) => Array.from(document.querySelectorAll(selector));
+
+function dealTypeLabel(type) {
+  return { sale: "매매", jeonse: "전세", monthly: "월세" }[type] || type;
+}
+
+function filterDeals() {
+  const target = new Date(state.selectedDate);
+  return state.deals.filter((deal) => {
+    if (state.period === "monthly") {
+      return deal.date.getFullYear() === target.getFullYear() && deal.date.getMonth() === target.getMonth();
+    }
+    const diff = Math.abs((target - deal.date) / 86400000);
+    return state.period === "weekly" ? diff <= 6 : diff < 1;
+  });
+}
+
+function summarizeBy(items, keyGetter) {
+  const map = new Map();
+  items.forEach((item) => {
+    const key = keyGetter(item);
+    if (!map.has(key)) map.set(key, { name: key, count: 0, sale: 0, jeonse: 0, monthly: 0 });
+    const row = map.get(key);
+    row.count += 1;
+    row[item.type] += 1;
+  });
+  return [...map.values()].sort((a, b) => b.count - a.count).slice(0, 10);
+}
+
+function renderKpis(deals) {
+  const count = (type) => deals.filter((deal) => deal.type === type).length;
+  $("#totalDeals").textContent = `${deals.length}건`;
+  $("#saleDeals").textContent = `${count("sale")}건`;
+  $("#jeonseDeals").textContent = `${count("jeonse")}건`;
+  $("#monthlyDeals").textContent = `${count("monthly")}건`;
+  $("#periodLabel").textContent = { daily: "일간 기준", weekly: "주간 기준", monthly: "월간 기준" }[state.period];
+}
+
+function renderBarChart(topApts) {
+  const max = Math.max(...topApts.map((row) => row.count), 1);
+  $("#barChart").innerHTML = topApts
+    .map((row) => {
+      const saleWidth = (row.sale / max) * 100;
+      const jeonseWidth = (row.jeonse / max) * 100;
+      const monthlyWidth = (row.monthly / max) * 100;
+      return `
+        <div class="bar-row">
+          <div class="bar-label">${row.name}<small>매매 ${row.sale} · 전세 ${row.jeonse} · 월세 ${row.monthly}</small></div>
+          <div class="bar-track">
+            <span class="bar-segment sale" style="width:${saleWidth}%"></span>
+            <span class="bar-segment jeonse" style="width:${jeonseWidth}%"></span>
+            <span class="bar-segment monthly" style="width:${monthlyWidth}%"></span>
+          </div>
+          <div class="bar-value">${row.count}</div>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function renderRankList(selector, rows, metaGetter = () => "") {
+  $(selector).innerHTML = rows
+    .map(
+      (row) => `
+        <li>
+          <div>
+            <div class="rank-name">${row.name}</div>
+            <div class="rank-meta">${metaGetter(row)}</div>
+          </div>
+          <span class="rank-count">${row.count}건</span>
+        </li>
+      `,
+    )
+    .join("");
+}
+
+function renderBriefing(deals, topApts, topDongs, topAreas) {
+  const selectedRows = deals.filter((deal) => deal.apartment === state.selectedApartment);
+  const selectedCount = selectedRows.length;
+  const firstApt = topApts[0]?.name || state.selectedApartment;
+  const firstDong = topDongs[0]?.name || "덕진구";
+  const firstArea = topAreas[0]?.name || "84㎡";
+
+  $("#briefingList").innerHTML = [
+    `${firstApt}가 현재 조회 기간 거래량 1위입니다. 매매와 임대 수요가 함께 확인되어 고객에게 시장 관심 단지로 소개하기 좋습니다.`,
+    `${firstDong} 생활권은 거래 빈도가 높아 비교 매물 설명과 가격 협상 근거를 만들기 좋습니다.`,
+    `${firstArea} 평형대가 가장 활발합니다. 실수요 가족 단위의 선호 면적이라는 점을 중심으로 상담 흐름을 잡을 수 있습니다.`,
+    `${state.selectedApartment} 지정 단지는 조회 기간 ${selectedCount}건입니다. 입지 장점과 최근 거래 분위기를 묶어 ‘생활 편의와 미래가치’ 관점으로 브리핑하세요.`,
+  ]
+    .map((text) => `<li>${text}</li>`)
+    .join("");
+}
+
+function renderLocationCards(topApts) {
+  const names = [...new Set([state.selectedApartment, ...topApts.map((row) => row.name)])].slice(0, 10);
+  $("#locationCards").innerHTML = names
+    .map((name) => {
+      const [academy, school, park, hospital, bank, note] = locationProfiles[name] || [74, 74, 74, 74, 74, "생활 편의시설과 주변 거래 흐름을 함께 확인해 맞춤형 상담 자료로 활용하세요."];
+      const isSelected = name === state.selectedApartment;
+      return `
+        <article class="location-card ${isSelected ? "selected" : ""}">
+          <div class="location-title">
+            <h3>${name}</h3>
+            <span class="badge">${isSelected ? "지정 단지" : "TOP10"}</span>
+          </div>
+          <div class="score-grid">
+            ${scoreCell("학원", academy)}
+            ${scoreCell("학교", school)}
+            ${scoreCell("공원", park)}
+            ${scoreCell("병원", hospital)}
+            ${scoreCell("은행", bank)}
+          </div>
+          <p>${note}</p>
+        </article>
+      `;
+    })
+    .join("");
+}
+
+function renderMap(topApts) {
+  const names = [...new Set([state.selectedApartment, ...topApts.map((row) => row.name)])].slice(0, 10);
+  $("#mapMarkers").innerHTML = names
+    .map((name, index) => {
+      const [x, y] = mapPositions[name] || [50 + (index % 3) * 8, 42 + Math.floor(index / 3) * 8];
+      const selected = name === state.selectedApartment ? "selected" : "";
+      const address = apartmentAddress[name] || "전북특별자치도 전주시 덕진구";
+      return `<button class="map-marker ${selected}" type="button" data-apartment="${name}" style="left:${x}%;top:${y}%">${index + 1}<span>${name}<small>${address}</small></span></button>`;
+    })
+    .join("");
+
+  const [academy, school, park, hospital, bank, note] = locationProfiles[state.selectedApartment] || [74, 74, 74, 74, 74, "생활 편의시설과 주변 거래 흐름을 함께 확인해 맞춤형 상담 자료로 활용하세요."];
+  $("#mapAptName").textContent = state.selectedApartment;
+  $("#mapAptAddress").textContent = apartmentAddress[state.selectedApartment] || "전북특별자치도 전주시 덕진구";
+  $("#mapAptSummary").textContent = note;
+  $("#mapSchoolScore").textContent = Math.round((academy + school) / 2);
+  $("#mapLifeScore").textContent = Math.round((park + hospital + bank) / 3);
+  $("#mapTransitScore").textContent = Math.round((academy + school + park + hospital + bank) / 5);
+
+  $(".map-marker").forEach((marker) => {
+    marker.addEventListener("click", () => {
+      state.selectedApartment = marker.dataset.apartment;
+      $("#apartmentSelect").value = state.selectedApartment;
+      render();
+    });
+  });
+}
+
+function scoreCell(label, value) {
+  return `<div class="score"><span>${label}</span><strong>${value}</strong></div>`;
+}
+
+function populateApartmentSelect() {
+  const names = [...new Set(seedDeals.map((deal) => deal.apartment))].sort();
+  $("#apartmentSelect").innerHTML = names.map((name) => `<option value="${name}">${name}</option>`).join("");
+  $("#apartmentSelect").value = state.selectedApartment;
+}
+
+function render() {
+  const deals = filterDeals();
+  const topApts = summarizeBy(deals, (deal) => deal.apartment);
+  const topDongs = summarizeBy(deals, (deal) => deal.dong);
+  const topAreas = summarizeBy(deals, (deal) => `${deal.area}㎡`);
+
+  renderKpis(deals);
+  renderBarChart(topApts);
+  renderRankList("#dongTop", topDongs, (row) => `매매 ${row.sale} · 전세 ${row.jeonse} · 월세 ${row.monthly}`);
+  renderRankList("#aptTop", topApts, (row) => `매매 ${row.sale} · 전세 ${row.jeonse} · 월세 ${row.monthly}`);
+  renderRankList("#areaTop", topAreas, (row) => `덕진구 선호 면적`);
+  renderBriefing(deals, topApts, topDongs, topAreas);
+  renderMap(topApts);
+  renderLocationCards(topApts);
+}
+
+function xmlItemsToDeals(xmlText, type) {
+  const doc = new DOMParser().parseFromString(xmlText, "text/xml");
+  const resultCode = doc.querySelector("resultCode")?.textContent;
+  if (resultCode && !["00", "000"].includes(resultCode)) {
+    throw new Error(doc.querySelector("resultMsg")?.textContent || "공공데이터 응답 오류");
+  }
+  return [...doc.querySelectorAll("item")].map((item) => {
+    const text = (...names) => names.map((name) => item.querySelector(name)?.textContent?.trim()).find(Boolean) || "";
+    const monthlyRent = Number(text("monthlyRent", "월세금").replace(/,/g, "")) || 0;
+    const rentType = type === "rent" ? (monthlyRent > 0 ? "monthly" : "jeonse") : "sale";
+    const year = Number(text("dealYear", "년")) || state.selectedDate.getFullYear();
+    const month = Number(text("dealMonth", "월")) || state.selectedDate.getMonth() + 1;
+    const day = Number(text("dealDay", "일")) || 1;
+    return {
+      apartment: text("aptNm", "아파트", "단지명") || "단지명 미확인",
+      dong: text("umdNm", "법정동") || "법정동 미확인",
+      area: String(Math.round(Number(text("excluUseAr", "전용면적")) || 0)) || "기타",
+      type: rentType,
+      date: new Date(year, month - 1, day),
+    };
+  });
+}
+
+async function fetchApiData() {
+  const key = $("#apiKeyInput").value.trim();
+  const lawd = $("#lawdInput").value.trim() || LAW_D_DEFAULT;
+  if (!key) {
+    $("#apiStatus").textContent = "인증키를 입력하면 공공데이터포털 실거래 자료를 불러옵니다.";
+    return;
+  }
+  const dealYmd = `${state.selectedDate.getFullYear()}${String(state.selectedDate.getMonth() + 1).padStart(2, "0")}`;
+  const query = `serviceKey=${encodeURIComponent(key)}&LAWD_CD=${encodeURIComponent(lawd)}&DEAL_YMD=${dealYmd}&numOfRows=1000&pageNo=1`;
+  $("#apiStatus").textContent = "공공데이터포털에서 매매와 전월세 자료를 불러오는 중입니다.";
+  try {
+    const [tradeResponse, rentResponse] = await Promise.all([
+      fetch(`${tradeEndpoint}?${query}`),
+      fetch(`${rentEndpoint}?${query}`),
+    ]);
+    const [tradeXml, rentXml] = await Promise.all([tradeResponse.text(), rentResponse.text()]);
+    const apiDeals = [...xmlItemsToDeals(tradeXml, "sale"), ...xmlItemsToDeals(rentXml, "rent")];
+    if (apiDeals.length === 0) {
+      $("#apiStatus").textContent = "조회된 실거래가 없어 내장 브리핑 예시 데이터를 유지합니다.";
+      return;
+    }
+    state.deals = apiDeals;
+    state.selectedApartment = apiDeals[0].apartment;
+    populateApartmentSelectFromCurrentDeals();
+    render();
+    $("#apiStatus").textContent = `실거래 ${apiDeals.length}건을 불러왔습니다.`;
+  } catch (error) {
+    $("#apiStatus").textContent = `브라우저 직접 호출이 차단되었거나 응답 오류가 있습니다. 현재는 예시 데이터로 표시합니다. (${error.message})`;
+  }
+}
+
+function populateApartmentSelectFromCurrentDeals() {
+  const names = [...new Set(state.deals.map((deal) => deal.apartment))].sort();
+  $("#apartmentSelect").innerHTML = names.map((name) => `<option value="${name}">${name}</option>`).join("");
+  $("#apartmentSelect").value = state.selectedApartment;
+}
+
+function bindEvents() {
+  $(".segment").forEach((button) => {
+    button.addEventListener("click", () => {
+      $(".segment").forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+      state.period = button.dataset.period;
+      render();
+    });
+  });
+  $("#datePicker").addEventListener("change", (event) => {
+    state.selectedDate = new Date(`${event.target.value}T00:00:00`);
+    render();
+  });
+  $("#apartmentSelect").addEventListener("change", (event) => {
+    state.selectedApartment = event.target.value;
+    render();
+  });
+  $("#printButton").addEventListener("click", () => window.print());
+  $("#loadApiButton").addEventListener("click", fetchApiData);
+}
+
+$("#datePicker").valueAsDate = state.selectedDate;
+populateApartmentSelect();
+bindEvents();
+render();
+
+    </script>
+  </body>
+</html>
