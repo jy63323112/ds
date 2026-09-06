@@ -163,8 +163,8 @@ h2 {
 
 .segmented {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  min-width: 250px;
+  grid-template-columns: repeat(2, 1fr);
+  min-width: 190px;
   padding: 4px;
   border-radius: 8px;
   background: #f2dfc3;
@@ -720,6 +720,33 @@ h2 {
   font-weight: 900;
 }
 
+.rank-badge {
+  background: linear-gradient(135deg, var(--copper), var(--orange));
+}
+
+.total-score {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 10px 0 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(155, 77, 22, 0.12);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(246, 139, 31, 0.14), rgba(255, 194, 71, 0.24));
+}
+
+.total-score span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.total-score strong {
+  color: var(--copper);
+  font-size: 24px;
+}
+
 .score-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -893,13 +920,12 @@ h2 {
         </div>
         <div class="hero-actions">
           <button class="primary-action" id="printButton" type="button">인쇄</button>
-          <a class="call-action" href="tel:01063323112">전화 자동연결</a>
+          <a class="call-action" href="mailto:jy63323112@mail.com">메일 보내기</a>
         </div>
       </section>
 
       <section class="control-strip" aria-label="조회 조건">
         <div class="segmented" role="tablist" aria-label="기간 단위">
-          <button class="segment" type="button" data-period="daily">일간</button>
           <button class="segment" type="button" data-period="weekly">주간</button>
           <button class="segment active" type="button" data-period="monthly">월간</button>
         </div>
@@ -1046,7 +1072,7 @@ h2 {
           <strong>주연공인중개사사무소</strong>
           <span>대표 공인중개사 김주연</span>
         </div>
-        <a href="tel:01063323112">010-6332-3112</a>
+        <a href="mailto:jy63323112@mail.com">jy63323112@mail.com</a>
       </footer>
     </main>
 
@@ -1157,7 +1183,7 @@ function filterDeals() {
       return deal.date.getFullYear() === target.getFullYear() && deal.date.getMonth() === target.getMonth();
     }
     const diff = Math.abs((target - deal.date) / 86400000);
-    return state.period === "weekly" ? diff <= 6 : diff < 1;
+    return diff <= 6;
   });
 }
 
@@ -1179,7 +1205,7 @@ function renderKpis(deals) {
   $("#saleDeals").textContent = `${count("sale")}건`;
   $("#jeonseDeals").textContent = `${count("jeonse")}건`;
   $("#monthlyDeals").textContent = `${count("monthly")}건`;
-  $("#periodLabel").textContent = { daily: "일간 기준", weekly: "주간 기준", monthly: "월간 기준" }[state.period];
+  $("#periodLabel").textContent = { weekly: "주간 기준", monthly: "월간 기준" }[state.period];
 }
 
 function renderBarChart(topApts) {
@@ -1239,15 +1265,27 @@ function renderBriefing(deals, topApts, topDongs, topAreas) {
 
 function renderLocationCards(topApts) {
   const names = [...new Set([state.selectedApartment, ...topApts.map((row) => row.name)])].slice(0, 10);
-  $("#locationCards").innerHTML = names
+  const ranked = names
     .map((name) => {
       const [academy, school, park, hospital, bank, note] = locationProfiles[name] || [74, 74, 74, 74, 74, "생활 편의시설과 주변 거래 흐름을 함께 확인해 맞춤형 상담 자료로 활용하세요."];
+      const total = Math.round((academy + school + park + hospital + bank) / 5);
+      return { name, academy, school, park, hospital, bank, note, total };
+    })
+    .sort((a, b) => b.total - a.total);
+
+  $("#locationCards").innerHTML = ranked
+    .map((item, index) => {
+      const { name, academy, school, park, hospital, bank, note, total } = item;
       const isSelected = name === state.selectedApartment;
       return `
         <article class="location-card ${isSelected ? "selected" : ""}">
           <div class="location-title">
             <h3>${name}</h3>
-            <span class="badge">${isSelected ? "지정 단지" : "TOP10"}</span>
+            <span class="badge rank-badge">${index + 1}위</span>
+          </div>
+          <div class="total-score">
+            <span>${isSelected ? "지정 단지 총점" : "입지분석 총점"}</span>
+            <strong>${total}점</strong>
           </div>
           <div class="score-grid">
             ${scoreCell("학원", academy)}
