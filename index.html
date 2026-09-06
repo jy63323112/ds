@@ -110,7 +110,6 @@ h2 {
 
 .hero-actions,
 .control-strip,
-.api-grid,
 .panel-heading,
 .legend,
 .office-footer {
@@ -125,8 +124,7 @@ h2 {
 }
 
 .primary-action,
-.call-action,
-#loadApiButton {
+.call-action {
   min-height: 46px;
   border: 0;
   border-radius: 8px;
@@ -144,8 +142,7 @@ h2 {
   color: var(--copper);
 }
 
-.call-action,
-#loadApiButton {
+.call-action {
   background: linear-gradient(135deg, var(--orange), var(--amber));
   color: #2b1603;
 }
@@ -187,8 +184,7 @@ h2 {
 }
 
 .date-control,
-.select-control,
-.api-grid label {
+.select-control {
   display: grid;
   gap: 6px;
   color: var(--muted);
@@ -197,8 +193,7 @@ h2 {
 }
 
 .date-control input,
-.select-control select,
-.api-grid input {
+.select-control select {
   min-height: 42px;
   min-width: 180px;
   border: 1px solid var(--line);
@@ -210,37 +205,6 @@ h2 {
 
 .select-control select {
   min-width: 260px;
-}
-
-.api-panel {
-  margin-left: auto;
-  min-width: min(100%, 460px);
-}
-
-.api-panel summary {
-  cursor: pointer;
-  color: var(--copper);
-  font-weight: 900;
-}
-
-.api-grid {
-  margin-top: 10px;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.api-grid label:first-child {
-  flex: 1 1 220px;
-}
-
-.api-grid input {
-  width: 100%;
-}
-
-.api-status {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 12px;
 }
 
 .kpi-grid,
@@ -724,32 +688,9 @@ h2 {
   background: linear-gradient(135deg, var(--copper), var(--orange));
 }
 
-.total-score {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 10px 0 12px;
-  padding: 12px 14px;
-  border: 1px solid rgba(155, 77, 22, 0.12);
-  border-radius: 8px;
-  background: linear-gradient(135deg, rgba(246, 139, 31, 0.14), rgba(255, 194, 71, 0.24));
-}
-
-.total-score span {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 900;
-}
-
-.total-score strong {
-  color: var(--copper);
-  font-size: 24px;
-}
-
 .score-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 8px;
   margin: 12px 0;
 }
@@ -776,6 +717,14 @@ h2 {
   font-size: 18px;
 }
 
+.score.total {
+  background: linear-gradient(135deg, rgba(246, 139, 31, 0.14), rgba(255, 194, 71, 0.24));
+}
+
+.score.total strong {
+  color: #8b3f0d;
+}
+
 .location-card p {
   margin: 0;
   color: #4b2c0d;
@@ -797,13 +746,17 @@ h2 {
   gap: 4px;
 }
 
+.footer-contact {
+  justify-items: end;
+}
+
 .office-footer span {
   color: #ffd98b;
 }
 
 .office-footer a {
   color: #fff9ed;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 900;
   text-decoration: none;
 }
@@ -853,8 +806,7 @@ h2 {
   .date-control,
   .select-control,
   .date-control input,
-  .select-control select,
-  .api-panel {
+  .select-control select {
     width: 100%;
     min-width: 0;
   }
@@ -926,8 +878,8 @@ h2 {
 
       <section class="control-strip" aria-label="조회 조건">
         <div class="segmented" role="tablist" aria-label="기간 단위">
-          <button class="segment" type="button" data-period="weekly">주간</button>
-          <button class="segment active" type="button" data-period="monthly">월간</button>
+          <button class="segment" type="button" data-period="weekly" aria-pressed="false">주간</button>
+          <button class="segment active" type="button" data-period="monthly" aria-pressed="true">월간</button>
         </div>
         <label class="date-control">
           <span>기준 날짜</span>
@@ -937,21 +889,6 @@ h2 {
           <span>성착 지정 아파트</span>
           <select id="apartmentSelect"></select>
         </label>
-        <details class="api-panel">
-          <summary>공공데이터 API 연결</summary>
-          <div class="api-grid">
-            <label>
-              <span>인증키</span>
-              <input id="apiKeyInput" type="password" autocomplete="off" placeholder="공공데이터포털 인증키" />
-            </label>
-            <label>
-              <span>지역코드</span>
-              <input id="lawdInput" type="text" value="52113" maxlength="5" />
-            </label>
-            <button id="loadApiButton" type="button">실거래 갱신</button>
-          </div>
-          <p id="apiStatus" class="api-status">기본값은 전북특별자치도 전주시 덕진구 코드 52113입니다.</p>
-        </details>
       </section>
 
       <section class="kpi-grid" aria-label="거래 요약">
@@ -1072,15 +1009,14 @@ h2 {
           <strong>주연공인중개사사무소</strong>
           <span>대표 공인중개사 김주연</span>
         </div>
-        <a href="mailto:jy63323112@mail.com">jy63323112@mail.com</a>
+        <div class="footer-contact">
+          <a href="mailto:jy63323112@mail.com">jy63323112@mail.com</a>
+          <a href="tel:01063323112">010-6332-3112</a>
+        </div>
       </footer>
     </main>
 
     <script>
-const LAW_D_DEFAULT = "52113";
-const tradeEndpoint = "https://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev";
-const rentEndpoint = "https://apis.data.go.kr/1613000/RTMSDataSvcAptRent/getRTMSDataSvcAptRent";
-
 const seedDeals = [
   ["에코시티더샵", "송천동2가", "84", "sale", 18],
   ["에코시티더샵", "송천동2가", "84", "jeonse", 11],
@@ -1283,11 +1219,8 @@ function renderLocationCards(topApts) {
             <h3>${name}</h3>
             <span class="badge rank-badge">${index + 1}위</span>
           </div>
-          <div class="total-score">
-            <span>${isSelected ? "지정 단지 총점" : "입지분석 총점"}</span>
-            <strong>${total}점</strong>
-          </div>
           <div class="score-grid">
+            ${scoreCell(`${index + 1}위 총점`, total, "total")}
             ${scoreCell("학원", academy)}
             ${scoreCell("학교", school)}
             ${scoreCell("공원", park)}
@@ -1329,8 +1262,8 @@ function renderMap(topApts) {
   });
 }
 
-function scoreCell(label, value) {
-  return `<div class="score"><span>${label}</span><strong>${value}</strong></div>`;
+function scoreCell(label, value, variant = "") {
+  return `<div class="score ${variant}"><span>${label}</span><strong>${value}</strong></div>`;
 }
 
 function populateApartmentSelect() {
@@ -1355,71 +1288,13 @@ function render() {
   renderLocationCards(topApts);
 }
 
-function xmlItemsToDeals(xmlText, type) {
-  const doc = new DOMParser().parseFromString(xmlText, "text/xml");
-  const resultCode = doc.querySelector("resultCode")?.textContent;
-  if (resultCode && !["00", "000"].includes(resultCode)) {
-    throw new Error(doc.querySelector("resultMsg")?.textContent || "공공데이터 응답 오류");
-  }
-  return [...doc.querySelectorAll("item")].map((item) => {
-    const text = (...names) => names.map((name) => item.querySelector(name)?.textContent?.trim()).find(Boolean) || "";
-    const monthlyRent = Number(text("monthlyRent", "월세금").replace(/,/g, "")) || 0;
-    const rentType = type === "rent" ? (monthlyRent > 0 ? "monthly" : "jeonse") : "sale";
-    const year = Number(text("dealYear", "년")) || state.selectedDate.getFullYear();
-    const month = Number(text("dealMonth", "월")) || state.selectedDate.getMonth() + 1;
-    const day = Number(text("dealDay", "일")) || 1;
-    return {
-      apartment: text("aptNm", "아파트", "단지명") || "단지명 미확인",
-      dong: text("umdNm", "법정동") || "법정동 미확인",
-      area: String(Math.round(Number(text("excluUseAr", "전용면적")) || 0)) || "기타",
-      type: rentType,
-      date: new Date(year, month - 1, day),
-    };
-  });
-}
-
-async function fetchApiData() {
-  const key = $("#apiKeyInput").value.trim();
-  const lawd = $("#lawdInput").value.trim() || LAW_D_DEFAULT;
-  if (!key) {
-    $("#apiStatus").textContent = "인증키를 입력하면 공공데이터포털 실거래 자료를 불러옵니다.";
-    return;
-  }
-  const dealYmd = `${state.selectedDate.getFullYear()}${String(state.selectedDate.getMonth() + 1).padStart(2, "0")}`;
-  const query = `serviceKey=${encodeURIComponent(key)}&LAWD_CD=${encodeURIComponent(lawd)}&DEAL_YMD=${dealYmd}&numOfRows=1000&pageNo=1`;
-  $("#apiStatus").textContent = "공공데이터포털에서 매매와 전월세 자료를 불러오는 중입니다.";
-  try {
-    const [tradeResponse, rentResponse] = await Promise.all([
-      fetch(`${tradeEndpoint}?${query}`),
-      fetch(`${rentEndpoint}?${query}`),
-    ]);
-    const [tradeXml, rentXml] = await Promise.all([tradeResponse.text(), rentResponse.text()]);
-    const apiDeals = [...xmlItemsToDeals(tradeXml, "sale"), ...xmlItemsToDeals(rentXml, "rent")];
-    if (apiDeals.length === 0) {
-      $("#apiStatus").textContent = "조회된 실거래가 없어 내장 브리핑 예시 데이터를 유지합니다.";
-      return;
-    }
-    state.deals = apiDeals;
-    state.selectedApartment = apiDeals[0].apartment;
-    populateApartmentSelectFromCurrentDeals();
-    render();
-    $("#apiStatus").textContent = `실거래 ${apiDeals.length}건을 불러왔습니다.`;
-  } catch (error) {
-    $("#apiStatus").textContent = `브라우저 직접 호출이 차단되었거나 응답 오류가 있습니다. 현재는 예시 데이터로 표시합니다. (${error.message})`;
-  }
-}
-
-function populateApartmentSelectFromCurrentDeals() {
-  const names = [...new Set(state.deals.map((deal) => deal.apartment))].sort();
-  $("#apartmentSelect").innerHTML = names.map((name) => `<option value="${name}">${name}</option>`).join("");
-  $("#apartmentSelect").value = state.selectedApartment;
-}
-
 function bindEvents() {
   $$(".segment").forEach((button) => {
     button.addEventListener("click", () => {
       $$(".segment").forEach((item) => item.classList.remove("active"));
+      $$(".segment").forEach((item) => item.setAttribute("aria-pressed", "false"));
       button.classList.add("active");
+      button.setAttribute("aria-pressed", "true");
       state.period = button.dataset.period;
       render();
     });
@@ -1433,7 +1308,6 @@ function bindEvents() {
     render();
   });
   $("#printButton").addEventListener("click", () => window.print());
-  $("#loadApiButton").addEventListener("click", fetchApiData);
 }
 
 $("#datePicker").valueAsDate = state.selectedDate;
