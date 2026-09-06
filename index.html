@@ -1282,7 +1282,7 @@ function renderMap(topApts) {
   $("#mapLifeScore").textContent = Math.round((park + hospital + bank) / 3);
   $("#mapTransitScore").textContent = Math.round((academy + school + park + hospital + bank) / 5);
 
-  $(".map-marker").forEach((marker) => {
+  $$(".map-marker").forEach((marker) => {
     marker.addEventListener("click", () => {
       state.selectedApartment = marker.dataset.apartment;
       $("#apartmentSelect").value = state.selectedApartment;
@@ -1378,9 +1378,9 @@ function populateApartmentSelectFromCurrentDeals() {
 }
 
 function bindEvents() {
-  $(".segment").forEach((button) => {
+  $$(".segment").forEach((button) => {
     button.addEventListener("click", () => {
-      $(".segment").forEach((item) => item.classList.remove("active"));
+      $$(".segment").forEach((item) => item.classList.remove("active"));
       button.classList.add("active");
       state.period = button.dataset.period;
       render();
