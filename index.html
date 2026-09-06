@@ -719,10 +719,24 @@ h2 {
 
 .score.total {
   background: linear-gradient(135deg, rgba(246, 139, 31, 0.14), rgba(255, 194, 71, 0.24));
+  border-color: rgba(155, 77, 22, 0.28);
+}
+
+.score.total span {
+  color: #4b2c0d;
+  font-weight: 950;
 }
 
 .score.total strong {
   color: #8b3f0d;
+  font-size: 21px;
+  font-weight: 950;
+}
+
+.date-range {
+  color: var(--copper);
+  font-size: 12px;
+  font-weight: 900;
 }
 
 .location-card p {
@@ -878,12 +892,13 @@ h2 {
 
       <section class="control-strip" aria-label="조회 조건">
         <div class="segmented" role="tablist" aria-label="기간 단위">
-          <button class="segment" type="button" data-period="weekly" aria-pressed="false">주간</button>
-          <button class="segment active" type="button" data-period="monthly" aria-pressed="true">월간</button>
+          <button class="segment active" type="button" data-period="weekly" aria-pressed="true">주간</button>
+          <button class="segment" type="button" data-period="monthly" aria-pressed="false">월간</button>
         </div>
         <label class="date-control">
           <span>기준 날짜</span>
           <input id="datePicker" type="date" />
+          <small id="dateRangeLabel" class="date-range">주간 범위</small>
         </label>
         <label class="select-control">
           <span>성착 지정 아파트</span>
@@ -895,7 +910,7 @@ h2 {
         <article class="kpi-card">
           <span>총 거래</span>
           <strong id="totalDeals">0건</strong>
-          <small id="periodLabel">월간 기준</small>
+          <small id="periodLabel">주간 기준</small>
         </article>
         <article class="kpi-card">
           <span>매매</span>
@@ -1099,7 +1114,7 @@ const apartmentAddress = {
 };
 
 let state = {
-  period: "monthly",
+  period: "weekly",
   selectedDate: new Date(2026, 7, 30),
   deals: seedDeals,
   selectedApartment: "에코시티더샵",
@@ -1118,9 +1133,32 @@ function filterDeals() {
     if (state.period === "monthly") {
       return deal.date.getFullYear() === target.getFullYear() && deal.date.getMonth() === target.getMonth();
     }
-    const diff = Math.abs((target - deal.date) / 86400000);
-    return diff <= 6;
+    const start = new Date(target);
+    start.setDate(target.getDate() - 6);
+    return deal.date >= start && deal.date <= target;
   });
+}
+
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function formatKoreanDate(date) {
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function renderDateRange() {
+  const target = new Date(state.selectedDate);
+  if (state.period === "weekly") {
+    const start = new Date(target);
+    start.setDate(target.getDate() - 6);
+    $("#dateRangeLabel").textContent = `주간 범위 ${formatKoreanDate(start)} ~ ${formatKoreanDate(target)}`;
+    return;
+  }
+  $("#dateRangeLabel").textContent = `월간 범위 ${target.getFullYear()}년 ${target.getMonth() + 1}월`;
 }
 
 function summarizeBy(items, keyGetter) {
@@ -1220,12 +1258,12 @@ function renderLocationCards(topApts) {
             <span class="badge rank-badge">${index + 1}위</span>
           </div>
           <div class="score-grid">
-            ${scoreCell("총점", total, "total")}
             ${scoreCell("학원", academy)}
             ${scoreCell("학교", school)}
             ${scoreCell("공원", park)}
             ${scoreCell("병원", hospital)}
             ${scoreCell("은행", bank)}
+            ${scoreCell("총점", total, "total")}
           </div>
           <p>${note}</p>
         </article>
@@ -1279,6 +1317,7 @@ function render() {
   const topAreas = summarizeBy(deals, (deal) => `${deal.area}㎡`);
 
   renderKpis(deals);
+  renderDateRange();
   renderBarChart(topApts);
   renderRankList("#dongTop", topDongs, (row) => `매매 ${row.sale} · 전세 ${row.jeonse} · 월세 ${row.monthly}`);
   renderRankList("#aptTop", topApts, (row) => `매매 ${row.sale} · 전세 ${row.jeonse} · 월세 ${row.monthly}`);
@@ -1310,7 +1349,7 @@ function bindEvents() {
   $("#printButton").addEventListener("click", () => window.print());
 }
 
-$("#datePicker").valueAsDate = state.selectedDate;
+$("#datePicker").value = formatDate(state.selectedDate);
 populateApartmentSelect();
 bindEvents();
 render();
